@@ -21,7 +21,7 @@ class ApiDadata {
             body: JSON.stringify({
                 "query": query,
                 "from_bound": { "value": "city" },
-                "to_bound": { "value": "city" }
+                "to_bound": { "value": "settlement" }
             })
         })
             .then(this._checkResponse);
