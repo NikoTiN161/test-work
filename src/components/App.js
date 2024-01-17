@@ -8,13 +8,15 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import SearchListGroup from './SearchListGroup';
 import CurrentWeather from './CurrentWeather';
-import WeatherForecast5 from './WeatherForecast5';
+import WeatherForecast from './WeatherForecast';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 // import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import apiDadata from '../api/ApiDadata';
 import apiOpenweather from '../api/ApiOpenweather';
+
+import { DateTime } from "luxon";
 
 function App() {
 
@@ -24,9 +26,10 @@ function App() {
    const [cities, setCities] = useState([]);
    const [error404, setError404] = useState(false);
    const [currentWeather, setCurrentWeather] = useState();
-   const [weatherForecast5, setWeatherForecast5] = useState();
+   const [weatherForecast, setWeatherForecast] = useState();
 
    const inputSearchRef = React.useRef(null);
+
 
    function onChengeSearch(e) {
       if (e.target.value.length >= 3) {
@@ -51,7 +54,6 @@ function App() {
       inputSearchRef.current.value = '';
       apiOpenweather.currentWeatherByCity(city).then(data => {
          setCurrentCity(data.name);
-         // setIdCurrentCity(data.sys.id);
          setCurrentWeather(data);
          console.log(data);
       })
@@ -63,18 +65,27 @@ function App() {
          const { latitude, longitude } = position.coords;
          apiOpenweather.currentWeatherByCoords(latitude, longitude).then(data => {
             setCurrentCity(data.name);
-            // setIdCurrentCity(data.sys.id);
             setCurrentWeather(data);
+            console.log(data);
          })
          .catch(err => { console.log(err); setError404(true) });
       })
    }
+
+   function filter3days(data) {
+      const dt = DateTime.now();
+      const dayOne = data.filter(e => e.dt_txt.includes(dt.plus({day: 1}).toFormat('yyyy-MM-dd')));
+      const dayTwo = data.filter(e => e.dt_txt.includes(dt.plus({day: 2}).toFormat('yyyy-MM-dd')));
+      const dayThree = data.filter(e => e.dt_txt.includes(dt.plus({day: 3}).toFormat('yyyy-MM-dd')));
+      return [dayOne, dayTwo, dayThree];
+}
+
    function onSelectTab() {
       navigator.geolocation.getCurrentPosition(position => {
          const { latitude, longitude } = position.coords;
-         apiOpenweather.getWeatherForecast5ByCoords(latitude, longitude).then(data => {
-            setWeatherForecast5(data.list);
-            console.log(data);
+         apiOpenweather.getWeatherForecastByCoords(latitude, longitude).then(data => {
+            setWeatherForecast(filter3days(data.list));
+            console.log(filter3days(data.list));
          })
          .catch(err => { console.log(err); setError404(true) });
       })
@@ -124,22 +135,22 @@ function App() {
                      </Col>
                   </Row>
                : null }
-               {currentCity !== defaultCity ?
-               <Row>
-                  <Tabs
-                     defaultActiveKey="currentWeather"
-                     id="fill-tab"
-                     className="mb-2"
-                     fill
-                     onSelect={onSelectTab}
-                  >
-                     <Tab eventKey="currentWeather" title="Текущая погода">
-                        <CurrentWeather data={currentWeather}/>
-                     </Tab>
-                     <Tab eventKey="weatherForecast5" title="Погода на 3 дня" >
-                        <WeatherForecast5 data={weatherForecast5}/>
-                     </Tab>
-                  </Tabs>
+               {currentWeather !== undefined ?
+                  <Row>
+                     <Tabs
+                        defaultActiveKey="currentWeather"
+                        id="fill-tab"
+                        className="mb-2"
+                        fill
+                        onSelect={onSelectTab}
+                     >
+                        <Tab eventKey="currentWeather" title="Текущая погода">
+                           <CurrentWeather data={currentWeather}/>
+                        </Tab>
+                        <Tab eventKey="weatherForecast" title="Погода на 3 дня" >
+                           <WeatherForecast data={weatherForecast}/>
+                        </Tab>
+                     </Tabs>
                   </Row>
                : null}
             </Form>

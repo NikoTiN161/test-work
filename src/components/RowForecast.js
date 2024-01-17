@@ -5,18 +5,16 @@ import { DateTime } from "luxon";
 
 function RowForecast(props) {
 
-    const dt = DateTime.fromSeconds(props.date);
-    let tempMinMax = `${Math.round(props.tempMin)}°...${Math.round(props.tempMax)}°`;
-
-    function getTimeOfDay(hour) {
-        switch (hour) {
-            case 0 || 3:
+    function getTimeOfDay(date) {
+        // let hour = DateTime.fromSeconds(Number(date)).hour;
+        switch (DateTime.fromSeconds(Number(date)).hour) {
+            case 3:
                 return 'Ночь';
-            case 6 || 9:
+            case 9:
                 return 'Утро';
-            case 12 || 15:
+            case 15:
                 return 'День';
-            case 18 || 21:
+            case 21:
                 return 'Вечер';
         default:
             break;
@@ -24,10 +22,10 @@ function RowForecast(props) {
     }
 
     return (
-        <Row>
+        <Row className='align-items-center'>
             <Col>
-                <h7>{getTimeOfDay(dt.hour)}</h7>
-                <h6>{tempMinMax}</h6>
+                <h6>{getTimeOfDay(props.date)}</h6>
+                <h6>{`${Math.round(props.tempMin)}°...${Math.round(props.tempMax)}°`}</h6>
             </Col>
 
             <Col>
