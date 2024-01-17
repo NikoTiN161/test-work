@@ -14,20 +14,17 @@ class ApiOpenweather {
     }
 
     currentWeatherByCity(city) {
-        return fetch(`${this._url}?q=${city}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
+        return fetch(`${this._url}/weather?q=${city}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
     }
 
     currentWeatherByCoords(latitude, longitude) {
-        return fetch(`${this._url}?lat=${latitude}&lon=${longitude}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
+        return fetch(`${this._url}/weather?lat=${latitude}&lon=${longitude}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
     }
 
     getWeatherForecast5ByCoords(latitude, longitude) {
         return fetch(`${this._url}/forecast?lat=${latitude}&lon=${longitude}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
     }
-
-    getWeatherForecast5ByCity(city) {
-        return fetch(`${this._url}/forecast?q=${city}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
-    }
+    
 
 }
 

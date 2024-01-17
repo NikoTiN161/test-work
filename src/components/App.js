@@ -16,14 +16,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import apiDadata from '../api/ApiDadata';
 import apiOpenweather from '../api/ApiOpenweather';
 
-
-
-
-
 function App() {
 
    const defaultCity = '📍';
    const [currentCity, setCurrentCity] = useState(defaultCity);
+   // const [idCurrentCity, setIdCurrentCity] = useState('');
    const [cities, setCities] = useState([]);
    const [error404, setError404] = useState(false);
    const [currentWeather, setCurrentWeather] = useState();
@@ -54,6 +51,8 @@ function App() {
       inputSearchRef.current.value = '';
       apiOpenweather.currentWeatherByCity(city).then(data => {
          setCurrentCity(data.name);
+         // setIdCurrentCity(data.sys.id);
+         setCurrentWeather(data);
          console.log(data);
       })
       .catch(err => { console.log(err); setError404(true) });
@@ -64,6 +63,7 @@ function App() {
          const { latitude, longitude } = position.coords;
          apiOpenweather.currentWeatherByCoords(latitude, longitude).then(data => {
             setCurrentCity(data.name);
+            // setIdCurrentCity(data.sys.id);
             setCurrentWeather(data);
          })
          .catch(err => { console.log(err); setError404(true) });
@@ -73,7 +73,8 @@ function App() {
       navigator.geolocation.getCurrentPosition(position => {
          const { latitude, longitude } = position.coords;
          apiOpenweather.getWeatherForecast5ByCoords(latitude, longitude).then(data => {
-            setWeatherForecast5(data);
+            setWeatherForecast5(data.list);
+            console.log(data);
          })
          .catch(err => { console.log(err); setError404(true) });
       })
@@ -81,7 +82,7 @@ function App() {
 
    return (
       <Container >
-         <Navbar >
+         <Navbar className='justify-content-center'>
             <Form inline='true'>
                <Row className='justify-content-between'>
                   <Col xl='auto'>
@@ -130,11 +131,12 @@ function App() {
                      id="fill-tab"
                      className="mb-2"
                      fill
+                     onSelect={onSelectTab}
                   >
                      <Tab eventKey="currentWeather" title="Текущая погода">
                         <CurrentWeather data={currentWeather}/>
                      </Tab>
-                     <Tab eventKey="weatherForecast5" title="Погода на 3 дня" onSelect={onSelectTab}>
+                     <Tab eventKey="weatherForecast5" title="Погода на 3 дня" >
                         <WeatherForecast5 data={weatherForecast5}/>
                      </Tab>
                   </Tabs>

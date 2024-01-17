@@ -5,9 +5,9 @@ import Col from 'react-bootstrap/Col';
 
 function CurrentWeather(props) {
 
-    return (props.data ??
+    return (
         <Container>
-            <Row className='justify-content-between'>
+            <Row className='justify-content-between align-items-center'>
                 <Col xs={1}>
                     <h1>{Math.round(props.data.main.temp) > 0 ? `+${Math.round(props.data.main.temp)}` : `${Math.round(props.data.main.temp)}`}&deg;C</h1>
                 </Col>

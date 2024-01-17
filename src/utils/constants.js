@@ -8,6 +8,6 @@ export const optionsDadata = {
 }
 
 export const optionsOpenweather = {
-    url: 'https://api.openweathermap.org/data/2.5/weather',
+    url: 'https://api.openweathermap.org/data/2.5',
     apiKey: "8f0f9f53940e938d9f16ac5af98d3326"
 }
