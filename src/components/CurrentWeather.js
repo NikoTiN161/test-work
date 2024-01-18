@@ -2,11 +2,18 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { DateTime } from "luxon";
+
 
 function CurrentWeather(props) {
 
     return (
         <Container>
+            <Row>
+                <Col>
+                    <h4>Сейчас, {DateTime.now().setLocale('ru').toFormat('dd MMMM')}</h4>
+                </Col>
+            </Row>
             <Row className='justify-content-between align-items-center'>
                 <Col xs={1}>
                     <h1>{Math.round(props.data.main.temp) > 0 ? `+${Math.round(props.data.main.temp)}` : `${Math.round(props.data.main.temp)}`}&deg;C</h1>

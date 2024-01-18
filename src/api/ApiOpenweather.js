@@ -25,6 +25,9 @@ class ApiOpenweather {
         return fetch(`${this._url}/forecast?lat=${latitude}&lon=${longitude}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
     }
     
+    getWeatherForecastByCity(city) {
+        return fetch(`${this._url}/forecast?q=${city}&appid=${this._apiKey}&units=metric&lang=ru`).then(this._checkResponse);
+    }
 
 }
 

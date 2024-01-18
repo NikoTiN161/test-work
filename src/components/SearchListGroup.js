@@ -1,18 +1,20 @@
-import ListGroup from 'react-bootstrap/ListGroup';
+// import ListGroup from 'react-bootstrap/ListGroup';
+import Dropdown from 'react-bootstrap/Dropdown';
+
 
 function SearchListGroup(props) {
 
     function onClickCity(e) {
         // console.log(e.target.dataset.geo_lat);
-        props.onClickCity(e.target.textContent);
+        props.onClickCity(e.target.value);
     }
 
     return (
-        <ListGroup>
-            {props.cities.map(e => {
-                return (<ListGroup.Item key={e.value} onClick={onClickCity}>{e.data.city ? e.data.city : e.value}</ListGroup.Item>);
+        <Dropdown.Menu show={true} style={{display: 'block'}}>
+            {props.cities.map((e, i) => {
+                return (<Dropdown.Item key={e.value} as="button" value={e.data.city ? e.data.city : e.value} onClick={onClickCity}>{e.data.city ? e.data.city : e.value}</Dropdown.Item>);
             })}
-        </ListGroup>
+        </Dropdown.Menu>
     );
 }
 

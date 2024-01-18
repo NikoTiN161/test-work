@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Dropdown from 'react-bootstrap/Dropdown';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -11,16 +12,17 @@ import CurrentWeather from './CurrentWeather';
 import WeatherForecast from './WeatherForecast';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-// import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import apiDadata from '../api/ApiDadata';
 import apiOpenweather from '../api/ApiOpenweather';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { DateTime } from "luxon";
+
 
 function App() {
 
-   const defaultCity = '📍';
+   const defaultCity = '';
+   const [showMenu, setShowMenu] = useState(false);
    const [currentCity, setCurrentCity] = useState(defaultCity);
    // const [idCurrentCity, setIdCurrentCity] = useState('');
    const [cities, setCities] = useState([]);
@@ -34,6 +36,7 @@ function App() {
    function onChengeSearch(e) {
       if (e.target.value.length >= 3) {
          // console.log('run api');
+         setShowMenu(true);
          apiDadata.getСities(e.target.value)
             .then(data => {
                setCities(data.suggestions);
@@ -41,12 +44,9 @@ function App() {
             .catch(err => { console.log(err); setError404(true) });
       } else {
          setCities([]);
+         setShowMenu(false);
       }
    }
-
-   // function onClickButtonSearch(e) {
-   //    e.preventDefault();
-   // }
 
    function onClickCity(city) {
       setCurrentCity(city);
@@ -80,16 +80,19 @@ function App() {
       return [dayOne, dayTwo, dayThree];
 }
 
-   function onSelectTab() {
-      navigator.geolocation.getCurrentPosition(position => {
-         const { latitude, longitude } = position.coords;
-         apiOpenweather.getWeatherForecastByCoords(latitude, longitude).then(data => {
+   useEffect(() => {
+      if (currentWeather) setError404(false);
+      }, [currentWeather]);
+
+   useEffect(() => {
+      if (currentCity !== defaultCity) {
+         apiOpenweather.getWeatherForecastByCity(currentCity).then(data => {
             setWeatherForecast(filter3days(data.list));
             console.log(filter3days(data.list));
          })
          .catch(err => { console.log(err); setError404(true) });
-      })
-   }
+      }
+   }, [currentCity]);
 
    return (
       <Container >
@@ -97,7 +100,7 @@ function App() {
             <Form inline='true'>
                <Row className='justify-content-between'>
                   <Col xl='auto'>
-                     <h4 className='h4'>Ваше местоположение: {currentCity}</h4>
+                     <h4 className='h4'>Ваше местоположение: {currentCity} 📍</h4>
                   </Col>
                   <Col xl='auto'>
                      <Button onClick={locate} variant='outline-primary'>Определить город</Button>
@@ -105,29 +108,26 @@ function App() {
                </Row>
                
                <Row>
-                  <Col  >
-                     <InputGroup>
-                        <InputGroup.Text id='iconSearch'>🔎</InputGroup.Text>
-                        <Form.Control
-                           ref={inputSearchRef}
-                           className='mr-sm-2'
-                           type='text'
-                           placeholder='Поиск города'
-                           onChange={onChengeSearch}
-                        />
-                     </InputGroup>
+                  <Col>
+                     <Dropdown
+                        as={InputGroup}
+                     >
+                        <InputGroup>
+                           <InputGroup.Text id='iconSearch'>🔎</InputGroup.Text>
+                           <Form.Control
+                              ref={inputSearchRef}
+                              className='mr-sm-2'
+                              type='text'
+                              placeholder='Поиск города'
+                              onChange={onChengeSearch}
+                           />
+                        </InputGroup>
+                        {cities.length > 0 ?
+                           <SearchListGroup show={showMenu} cities={cities} onClickCity={onClickCity} />
+                        : null}
+                     </Dropdown>
                   </Col>
-                  {/* <Col xs='auto'>
-                     <Button type='submit' onClick={onClickButtonSearch}>Поиск</Button>
-                  </Col> */}
                </Row>
-               {cities.length > 0 ?
-                  <Row>
-                     <Col >
-                        <SearchListGroup cities={cities} onClickCity={onClickCity} />
-                     </Col>
-                  </Row>
-                  : null}
                {error404 ?
                   <Row>
                      <Col >
@@ -142,7 +142,6 @@ function App() {
                         id="fill-tab"
                         className="mb-2"
                         fill
-                        onSelect={onSelectTab}
                      >
                         <Tab eventKey="currentWeather" title="Текущая погода">
                            <CurrentWeather data={currentWeather}/>
