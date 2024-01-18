@@ -14,7 +14,7 @@ class ApiDadata {
     }
 
     getСities(query) {
-        return fetch(this._url, {
+        return fetch(`${this._url}/suggest/address`, {
             method: 'POST',
             mode: 'cors',
             headers: this._headers,
@@ -22,6 +22,20 @@ class ApiDadata {
                 "query": query,
                 "from_bound": { "value": "city" },
                 "to_bound": { "value": "settlement" }
+            })
+        })
+            .then(this._checkResponse);
+    }
+
+    getCityByCoordinates(lon, lat) {
+        return fetch(`${this._url}/geolocate/address`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: this._headers,
+            body: JSON.stringify({
+                "lon": lon,
+                "lat": lat,
+
             })
         })
             .then(this._checkResponse);

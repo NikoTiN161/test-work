@@ -25,6 +25,7 @@ function App() {
    const [showMenu, setShowMenu] = useState(false);
    const [currentCity, setCurrentCity] = useState(defaultCity);
    // const [idCurrentCity, setIdCurrentCity] = useState('');
+   const [coords, setCoords] = useState({lon: null, lat: null});
    const [cities, setCities] = useState([]);
    const [error404, setError404] = useState(false);
    const [currentWeather, setCurrentWeather] = useState();
@@ -53,7 +54,8 @@ function App() {
       setCities([]);
       inputSearchRef.current.value = '';
       apiOpenweather.currentWeatherByCity(city).then(data => {
-         setCurrentCity(data.name);
+         // setCurrentCity(data.name);
+         setCoords({lon: data.coord.lon, lat:data.coord.lat});
          setCurrentWeather(data);
          console.log(data);
       })
@@ -63,10 +65,18 @@ function App() {
    function locate() {
       navigator.geolocation.getCurrentPosition(position => {
          const { latitude, longitude } = position.coords;
+         setCoords({lon: longitude, lat: latitude});
          apiOpenweather.currentWeatherByCoords(latitude, longitude).then(data => {
-            setCurrentCity(data.name);
+            // setCurrentCity(data.name);
             setCurrentWeather(data);
             console.log(data);
+         })
+         .catch(err => { console.log(err); setError404(true) });
+
+         apiDadata.getCityByCoordinates(longitude, latitude).then(data => {
+            setCurrentCity(data.suggestions[0].data.city);
+            // console.log(data);
+            
          })
          .catch(err => { console.log(err); setError404(true) });
       })
@@ -81,18 +91,18 @@ function App() {
 }
 
    useEffect(() => {
-      if (currentWeather) setError404(false);
+      if (currentWeather === undefined) setError404(false);
       }, [currentWeather]);
 
    useEffect(() => {
-      if (currentCity !== defaultCity) {
-         apiOpenweather.getWeatherForecastByCity(currentCity).then(data => {
+      if (coords.lon !== null) {
+         apiOpenweather.getWeatherForecastByCoords(coords.lat, coords.lon).then(data => {
             setWeatherForecast(filter3days(data.list));
             console.log(filter3days(data.list));
          })
          .catch(err => { console.log(err); setError404(true) });
       }
-   }, [currentCity]);
+   }, [coords, currentCity]);
 
    return (
       <Container >
@@ -128,13 +138,13 @@ function App() {
                      </Dropdown>
                   </Col>
                </Row>
-               {error404 ?
+               {/* {error404 ?
                   <Row>
                      <Col >
                         <h3 className='h3'>Упс! Какая-то ошибка. Выгляните в окно :)</h3>
                      </Col>
                   </Row>
-               : null }
+               : null } */}
                {currentWeather !== undefined ?
                   <Row>
                      <Tabs
