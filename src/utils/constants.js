@@ -1,5 +1,5 @@
 export const optionsDadata = {
-    url: 'http://suggestions.dadata.ru/suggestions/api/4_1/rs',
+    url: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs',
     headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
